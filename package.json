@@ -1,0 +1,15 @@
+{
+  "name": "codex-gate-prize-wheel",
+  "version": "1.0.0",
+  "description": "Interactive prize wheel with QR registration, queue management, and stock tracking",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["prize-wheel", "event", "kiosk"],
+  "license": "UNLICENSED",
+  "private": true
+}
