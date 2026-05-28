@@ -437,10 +437,11 @@
 <div class="lock-screen" id="lockScreen" style="display:none;">
   <div class="lock-card">
     <div class="lock-icon">&#128274;</div>
-    <div class="lock-title">ADMIN LOCKED</div>
-    <div class="lock-hint">Enter the admin password to continue.</div>
-    <input type="password" id="lockInput" placeholder="••••••" autocomplete="current-password" />
-    <button id="lockUnlockBtn">UNLOCK</button>
+    <div class="lock-title">ADMIN SIGN IN</div>
+    <div class="lock-hint">Enter your admin email and password.</div>
+    <input type="email" id="lockEmail" placeholder="admin@example.com" autocomplete="username" />
+    <input type="password" id="lockPassword" placeholder="Password" autocomplete="current-password" />
+    <button id="lockUnlockBtn">SIGN IN</button>
     <div class="lock-error" id="lockError"></div>
   </div>
 </div>
@@ -462,7 +463,6 @@
       <button class="tab-btn" data-tab="stock">STOCK</button>
       <button class="tab-btn" data-tab="queue">QUEUE <span class="badge" id="queueBadge" style="display:none;">0</span></button>
       <button class="tab-btn" data-tab="history">HISTORY</button>
-      <button class="tab-btn" data-tab="settings">SETTINGS</button>
     </div>
 
     <!-- PRIZES -->
@@ -517,20 +517,6 @@
       <button class="panel-btn danger" id="clearHistoryBtn">CLEAR HISTORY</button>
     </div>
 
-    <!-- SETTINGS -->
-    <div class="panel" id="panel-settings">
-      <h2>SETTINGS</h2>
-      <p class="hint">Manage the admin password. This password protects this admin page across all devices.</p>
-      <div class="settings-section">
-        <h3 id="pwSectionTitle">SET ADMIN PASSWORD</h3>
-        <input type="password" id="pwCurrent" placeholder="Current password" style="display:none;" />
-        <input type="password" id="pwNew" placeholder="New password (min 4 chars)" />
-        <input type="password" id="pwConfirm" placeholder="Confirm new password" />
-        <button class="panel-btn primary" id="pwSaveBtn">SAVE PASSWORD</button>
-        <button class="panel-btn danger" id="pwRemoveBtn" style="display:none;">REMOVE PASSWORD</button>
-        <div class="msg" id="pwMsg"></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -553,8 +539,8 @@ let state = {
   items: [],
   queue: [],
   history: [],
-  hasPassword: false,
-  authedHash: null,
+  requiresAuth: true,
+  authedEmail: null,
 };
 
 // ===== LOCK FLOW =====
@@ -562,19 +548,21 @@ async function checkAuth() {
   const res = await fetch('/api/settings');
   if (!res.ok) return false;
   const data = await res.json();
-  state.hasPassword = !!data.hasPassword;
-  if (!state.hasPassword) return true;
-  const cached = sessionStorage.getItem('cgw_admin_hash');
-  if (cached) {
+  state.requiresAuth = !!data.requiresAuth;
+  if (!state.requiresAuth) return true;
+  const cachedEmail = sessionStorage.getItem('cgw_admin_email');
+  const cachedHash = sessionStorage.getItem('cgw_admin_hash');
+  if (cachedEmail && cachedHash) {
     const v = await fetch('/api/settings/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hash: cached }),
+      body: JSON.stringify({ email: cachedEmail, hash: cachedHash }),
     }).then(r => r.json()).catch(() => null);
     if (v && v.ok) {
-      state.authedHash = cached;
+      state.authedEmail = cachedEmail;
       return true;
     }
+    sessionStorage.removeItem('cgw_admin_email');
     sessionStorage.removeItem('cgw_admin_hash');
   }
   return false;
@@ -583,43 +571,48 @@ async function checkAuth() {
 function showLock() {
   $('lockScreen').style.display = 'flex';
   $('adminApp').style.display = 'none';
-  setTimeout(() => $('lockInput').focus(), 50);
+  setTimeout(() => $('lockEmail').focus(), 50);
 }
 function showApp() {
   $('lockScreen').style.display = 'none';
   $('adminApp').style.display = '';
-  $('lockBtn').style.display = state.hasPassword ? '' : 'none';
+  $('lockBtn').style.display = state.requiresAuth ? '' : 'none';
   startPolling();
 }
 
 async function tryUnlock() {
-  const pw = $('lockInput').value;
-  if (!pw) { $('lockError').textContent = 'Enter the password.'; return; }
+  const email = $('lockEmail').value.trim();
+  const pw = $('lockPassword').value;
+  if (!email) { $('lockError').textContent = 'Enter your email.'; return; }
+  if (!pw) { $('lockError').textContent = 'Enter your password.'; return; }
   const hash = await hashPassword(pw);
   const res = await fetch('/api/settings/verify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ hash }),
+    body: JSON.stringify({ email, hash }),
   });
   const data = await res.json().catch(() => null);
   if (data && data.ok) {
-    state.authedHash = hash;
+    state.authedEmail = email;
+    sessionStorage.setItem('cgw_admin_email', email);
     sessionStorage.setItem('cgw_admin_hash', hash);
     $('lockError').textContent = '';
-    $('lockInput').value = '';
+    $('lockPassword').value = '';
     showApp();
   } else {
-    $('lockError').textContent = 'Wrong password.';
-    $('lockInput').value = '';
-    $('lockInput').focus();
+    $('lockError').textContent = 'Invalid email or password.';
+    $('lockPassword').value = '';
+    $('lockPassword').focus();
   }
 }
 
 $('lockUnlockBtn').addEventListener('click', tryUnlock);
-$('lockInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+$('lockEmail').addEventListener('keydown', e => { if (e.key === 'Enter') $('lockPassword').focus(); });
+$('lockPassword').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
 $('lockBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('cgw_admin_email');
   sessionStorage.removeItem('cgw_admin_hash');
-  state.authedHash = null;
+  state.authedEmail = null;
   showLock();
 });
 
@@ -632,7 +625,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     $('panel-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'queue') loadQueue();
     if (btn.dataset.tab === 'history') loadHistory();
-    if (btn.dataset.tab === 'settings') updatePasswordUI();
   });
 });
 
@@ -859,80 +851,6 @@ $('clearHistoryBtn').addEventListener('click', async () => {
   if (res.ok) {
     state.history = [];
     renderHistory();
-  }
-});
-
-// ===== SETTINGS / PASSWORD =====
-function updatePasswordUI() {
-  $('pwSectionTitle').textContent = state.hasPassword ? 'CHANGE ADMIN PASSWORD' : 'SET ADMIN PASSWORD';
-  $('pwCurrent').style.display = state.hasPassword ? '' : 'none';
-  $('pwRemoveBtn').style.display = state.hasPassword ? '' : 'none';
-}
-
-$('pwSaveBtn').addEventListener('click', async () => {
-  const msg = $('pwMsg');
-  msg.textContent = '';
-  msg.className = 'msg';
-  const newPw = $('pwNew').value;
-  const confirmPw = $('pwConfirm').value;
-  if (!newPw) { msg.textContent = 'Enter a new password.'; msg.className = 'msg error'; return; }
-  if (newPw.length < 4) { msg.textContent = 'Minimum 4 characters.'; msg.className = 'msg error'; return; }
-  if (newPw !== confirmPw) { msg.textContent = 'Passwords do not match.'; msg.className = 'msg error'; return; }
-
-  const body = { newHash: await hashPassword(newPw) };
-  if (state.hasPassword) {
-    const curr = $('pwCurrent').value;
-    if (!curr) { msg.textContent = 'Enter your current password.'; msg.className = 'msg error'; return; }
-    body.currentHash = await hashPassword(curr);
-  }
-  const res = await fetch('/api/settings/password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => null);
-  if (res.ok && data && data.ok) {
-    state.hasPassword = !!data.hasPassword;
-    state.authedHash = body.newHash;
-    sessionStorage.setItem('cgw_admin_hash', body.newHash);
-    msg.textContent = 'Password saved!';
-    msg.className = 'msg success';
-    $('pwCurrent').value = '';
-    $('pwNew').value = '';
-    $('pwConfirm').value = '';
-    updatePasswordUI();
-    $('lockBtn').style.display = state.hasPassword ? '' : 'none';
-    setTimeout(() => { msg.textContent = ''; }, 2500);
-  } else {
-    msg.textContent = (data && data.error) || 'Could not save password.';
-    msg.className = 'msg error';
-  }
-});
-
-$('pwRemoveBtn').addEventListener('click', async () => {
-  if (!confirm('Remove the admin password? Anyone will be able to access this page.')) return;
-  const msg = $('pwMsg');
-  msg.textContent = '';
-  msg.className = 'msg';
-  const curr = $('pwCurrent').value;
-  if (!curr) { msg.textContent = 'Enter your current password.'; msg.className = 'msg error'; return; }
-  const res = await fetch('/api/settings/password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ currentHash: await hashPassword(curr), newHash: null }),
-  });
-  const data = await res.json().catch(() => null);
-  if (res.ok && data && data.ok) {
-    state.hasPassword = false;
-    sessionStorage.removeItem('cgw_admin_hash');
-    msg.textContent = 'Password removed.';
-    msg.className = 'msg success';
-    $('pwCurrent').value = '';
-    updatePasswordUI();
-    $('lockBtn').style.display = 'none';
-  } else {
-    msg.textContent = (data && data.error) || 'Could not remove password.';
-    msg.className = 'msg error';
   }
 });
 
