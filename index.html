@@ -27,17 +27,12 @@
     overflow: hidden;
   }
 
-  /* ========== DISPLAY VIEW ========== */
   .app {
-    display: grid;
-    grid-template-columns: 1fr 420px;
+    display: flex;
     height: 100vh;
-    transition: grid-template-columns 0.4s ease;
+    align-items: center;
+    justify-content: center;
   }
-  .app.hide-config { grid-template-columns: 1fr 0px; }
-  .app.hide-config .config { transform: translateX(100%); opacity: 0; pointer-events: none; }
-
-  /* ---------- STAGE ---------- */
   .stage {
     position: relative;
     display: flex;
@@ -45,6 +40,8 @@
     align-items: center;
     justify-content: center;
     padding: 20px 30px 16px;
+    width: 100%;
+    max-width: 1100px;
   }
   .header {
     position: absolute;
@@ -69,6 +66,9 @@
     letter-spacing: 1px;
     transition: background 0.2s;
     font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
   }
   .btn-icon:hover { background: var(--purple-light); }
 
@@ -112,13 +112,6 @@
     gap: 6px;
     z-index: 5;
   }
-  .actions-area {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
   .qr-box {
     background: var(--white);
     border: 2px solid var(--purple-light);
@@ -137,6 +130,14 @@
     letter-spacing: 2px;
     color: var(--purple-mid);
     text-align: center;
+  }
+
+  .actions-area {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
   .actions {
     display: flex;
@@ -203,7 +204,17 @@
   }
   .queue-badge.empty { background: var(--purple-lavender); }
 
-  /* ---------- WINNER OVERLAY ---------- */
+  .conn-status {
+    position: absolute;
+    bottom: 18px;
+    right: 30px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--purple-lavender);
+    z-index: 5;
+  }
+  .conn-status.online { color: var(--green); }
+
   .winner-overlay {
     position: fixed; inset: 0;
     background: rgba(245,240,251,0.97);
@@ -258,432 +269,6 @@
   }
   .winner-overlay .winner-close:hover { background: var(--purple-darker); }
 
-  /* ---------- CONFIG PANEL ---------- */
-  .config {
-    position: relative;
-    background: var(--white);
-    border-left: 1px solid var(--purple-light);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: transform 0.4s ease, opacity 0.3s ease;
-  }
-  .tab-bar {
-    display: flex;
-    border-bottom: 2px solid var(--purple-light);
-    flex-shrink: 0;
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 14px 8px;
-    background: transparent;
-    border: none;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: var(--purple-lavender);
-    cursor: pointer;
-    font-family: inherit;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .tab-btn:hover { color: var(--purple-mid); }
-  .tab-btn.active { color: var(--purple-deep); border-bottom-color: var(--purple-deep); }
-  .tab-btn .badge {
-    display: inline-block;
-    background: var(--green);
-    color: var(--white);
-    font-size: 9px;
-    padding: 1px 6px;
-    border-radius: 99px;
-    margin-left: 4px;
-    vertical-align: middle;
-  }
-  .tab-panel {
-    display: none;
-    padding: 20px 24px;
-    overflow-y: auto;
-    flex: 1;
-  }
-  .tab-panel.active { display: block; }
-  .tab-panel h3 {
-    font-size: 13px;
-    color: var(--purple-deep);
-    letter-spacing: 2px;
-    margin-bottom: 4px;
-  }
-  .tab-panel .hint {
-    font-size: 11px;
-    color: var(--purple-lavender);
-    margin-bottom: 14px;
-    line-height: 1.5;
-  }
-
-  /* prizes tab */
-  .col-header {
-    display: grid;
-    grid-template-columns: 46px 1fr 60px 30px;
-    gap: 6px;
-    margin-bottom: 4px;
-    font-size: 9px;
-    color: var(--purple-lavender);
-    letter-spacing: 2px;
-    font-weight: bold;
-  }
-  .col-header div { padding: 0 2px; }
-  .col-header div:nth-child(1) { text-align: center; }
-  .col-header div:nth-child(3) { text-align: center; }
-  .item-row {
-    display: grid;
-    grid-template-columns: 46px 1fr 60px 30px;
-    gap: 6px;
-    margin-bottom: 5px;
-    align-items: center;
-  }
-  .item-row input {
-    padding: 8px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--purple-light);
-    background: var(--purple-pale);
-    color: var(--purple-deep);
-    font-size: 13px;
-    font-family: inherit;
-    width: 100%;
-  }
-  .item-row input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
-  .item-row input.icon { text-align: center; font-size: 18px; padding: 5px; }
-  .item-row input.weight { text-align: center; }
-  .item-row .remove {
-    background: transparent;
-    border: 1px solid var(--purple-light);
-    color: var(--purple-lavender);
-    border-radius: 50%;
-    width: 28px; height: 28px;
-    cursor: pointer;
-    font-size: 15px;
-    line-height: 1;
-    font-family: inherit;
-  }
-  .item-row .remove:hover { background: var(--purple-light); color: var(--purple-deep); }
-  .item-row .icon { cursor: pointer; }
-
-  /* emoji picker */
-  .emoji-picker {
-    position: absolute;
-    z-index: 50;
-    background: var(--white);
-    border: 1px solid var(--purple-light);
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 8px 24px rgba(61,27,107,0.18);
-    max-width: 260px;
-    display: none;
-  }
-  .emoji-picker.show { display: block; }
-  .emoji-picker .ep-label {
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: var(--purple-lavender);
-    margin-bottom: 6px;
-  }
-  .emoji-picker .ep-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .emoji-picker .ep-btn {
-    width: 36px; height: 36px;
-    border: 1px solid var(--purple-light);
-    background: var(--purple-pale);
-    border-radius: 8px;
-    font-size: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .emoji-picker .ep-btn:hover { background: var(--purple-light); transform: scale(1.15); }
-
-  /* stock tab */
-  .stock-header {
-    display: grid;
-    grid-template-columns: 36px 1fr 70px 70px;
-    gap: 6px;
-    margin-bottom: 4px;
-    font-size: 9px;
-    color: var(--purple-lavender);
-    letter-spacing: 2px;
-    font-weight: bold;
-  }
-  .stock-header div:nth-child(3),
-  .stock-header div:nth-child(4) { text-align: center; }
-  .stock-row {
-    display: grid;
-    grid-template-columns: 36px 1fr 70px 70px;
-    gap: 6px;
-    margin-bottom: 5px;
-    align-items: center;
-    font-size: 13px;
-  }
-  .stock-row .stock-icon { text-align: center; font-size: 18px; }
-  .stock-row .stock-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .stock-row input {
-    padding: 8px 4px;
-    border-radius: 8px;
-    border: 1px solid var(--purple-light);
-    background: var(--purple-pale);
-    color: var(--purple-deep);
-    font-size: 13px;
-    font-family: inherit;
-    width: 100%;
-    text-align: center;
-  }
-  .stock-row input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
-  .stock-row .won-count {
-    text-align: center;
-    color: var(--purple-lavender);
-    font-weight: bold;
-  }
-  .stock-row.out-of-stock { opacity: 0.45; }
-
-  /* queue tab */
-  .queue-entry {
-    padding: 10px 12px;
-    background: var(--purple-pale);
-    margin-bottom: 4px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-  }
-  .queue-entry .q-name { font-weight: bold; }
-  .queue-entry .q-course { font-size: 11px; color: var(--purple-lavender); }
-  .queue-entry .q-remove {
-    background: transparent;
-    border: 1px solid var(--purple-light);
-    color: var(--purple-lavender);
-    border-radius: 50%;
-    width: 24px; height: 24px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: inherit;
-  }
-  .queue-entry .q-remove:hover { background: var(--purple-light); color: var(--red); }
-  .queue-empty {
-    padding: 20px;
-    text-align: center;
-    color: var(--purple-lavender);
-    font-size: 12px;
-    font-style: italic;
-  }
-  .manual-add-form {
-    margin-top: 12px;
-    padding: 14px;
-    background: var(--purple-pale);
-    border-radius: 10px;
-  }
-  .manual-add-form h4 {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--purple-mid);
-    margin-bottom: 8px;
-  }
-  .manual-add-form input {
-    display: block;
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    border-radius: 8px;
-    border: 1px solid var(--purple-light);
-    background: var(--white);
-    color: var(--purple-deep);
-    font-size: 13px;
-    font-family: inherit;
-  }
-  .manual-add-form input:focus { outline: none; border-color: var(--purple-mid); }
-
-  /* history tab */
-  .history-entry {
-    padding: 8px 12px;
-    background: var(--purple-pale);
-    margin-bottom: 4px;
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--purple-deep);
-  }
-  .history-entry .h-top { display: flex; justify-content: space-between; align-items: center; }
-  .history-entry .h-prize { font-weight: bold; }
-  .history-entry .h-time { color: var(--purple-lavender); font-size: 10px; }
-  .history-entry .h-person { color: var(--purple-mid); font-size: 11px; margin-top: 2px; }
-  .history-empty {
-    padding: 20px;
-    text-align: center;
-    color: var(--purple-lavender);
-    font-size: 12px;
-    font-style: italic;
-  }
-
-  /* shared panel buttons */
-  .panel-btn {
-    margin-top: 10px;
-    padding: 10px;
-    background: var(--white);
-    border: 1px dashed var(--purple-mid);
-    color: var(--purple-mid);
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    font-weight: bold;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-family: inherit;
-  }
-  .panel-btn:hover { background: var(--purple-pale); }
-  .panel-btn.secondary { border-style: solid; border-color: var(--purple-light); color: var(--purple-lavender); }
-  .panel-btn.secondary:hover { color: var(--purple-deep); }
-
-  .server-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-top: 1px solid var(--purple-light);
-    flex-shrink: 0;
-  }
-  .server-status {
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-align: center;
-    color: var(--purple-lavender);
-  }
-  .server-status.online { color: var(--green); }
-  .reconnect-btn {
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border: 1px solid var(--purple-light);
-    background: transparent;
-    color: var(--purple-lavender);
-    border-radius: 999px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.2s;
-  }
-  .reconnect-btn:hover { background: var(--purple-pale); color: var(--purple-deep); }
-  .reconnect-btn.trying { pointer-events: none; opacity: 0.5; }
-
-  /* ---------- SETTINGS LOGIN OVERLAY ---------- */
-  .settings-lock {
-    position: absolute;
-    inset: 0;
-    background: var(--white);
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 30px;
-    text-align: center;
-  }
-  .settings-lock .lock-icon { font-size: 48px; margin-bottom: 16px; }
-  .settings-lock .lock-title {
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: var(--purple-deep);
-    margin-bottom: 6px;
-  }
-  .settings-lock .lock-hint {
-    font-size: 11px;
-    color: var(--purple-lavender);
-    margin-bottom: 20px;
-  }
-  .settings-lock input {
-    width: 220px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--purple-light);
-    background: var(--purple-pale);
-    color: var(--purple-deep);
-    font-size: 16px;
-    font-family: inherit;
-    text-align: center;
-    letter-spacing: 4px;
-  }
-  .settings-lock input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
-  .settings-lock .lock-btn {
-    margin-top: 14px;
-    padding: 12px 40px;
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    background: var(--purple-deep);
-    color: var(--white);
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .settings-lock .lock-btn:hover { background: var(--purple-darker); }
-  .settings-lock .lock-error {
-    margin-top: 10px;
-    font-size: 11px;
-    color: var(--red);
-    min-height: 16px;
-  }
-  .settings-lock .lock-forgot {
-    margin-top: 16px;
-    font-size: 10px;
-    color: var(--purple-lavender);
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: underline;
-    font-family: inherit;
-  }
-  .settings-lock .lock-forgot:hover { color: var(--purple-mid); }
-
-  /* password section in settings */
-  .password-section {
-    margin-top: 12px;
-    padding: 14px;
-    background: var(--purple-pale);
-    border-radius: 10px;
-  }
-  .password-section h4 {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--purple-mid);
-    margin-bottom: 8px;
-  }
-  .password-section input {
-    display: block;
-    width: 100%;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    border-radius: 8px;
-    border: 1px solid var(--purple-light);
-    background: var(--white);
-    color: var(--purple-deep);
-    font-size: 13px;
-    font-family: inherit;
-  }
-  .password-section input:focus { outline: none; border-color: var(--purple-mid); }
-  .password-section .pw-msg {
-    font-size: 11px;
-    min-height: 16px;
-    margin-top: 4px;
-  }
-  .password-section .pw-msg.success { color: var(--green); }
-  .password-section .pw-msg.error { color: var(--red); }
-
-  /* ========== REGISTER VIEW (mobile) ========== */
   .register-view {
     min-height: 100vh;
     display: flex;
@@ -765,12 +350,7 @@
     text-align: center;
     display: none;
   }
-
-  /* registration success */
-  .register-success {
-    text-align: center;
-    display: none;
-  }
+  .register-success { text-align: center; display: none; }
   .register-success .rs-icon { font-size: 64px; margin-bottom: 12px; }
   .register-success .rs-title {
     font-size: 22px;
@@ -810,170 +390,80 @@
     font-weight: bold;
     color: var(--purple-deep);
   }
-
-  /* mobile / narrow */
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; }
-    .config { border-left: none; border-top: 1px solid var(--purple-light); max-height: 45vh; }
-  }
 </style>
 </head>
 <body>
 
 <!-- ===== DISPLAY VIEW ===== -->
 <div id="displayView">
-<div class="app" id="app">
-  <div class="stage">
-    <div class="header">
-      <div class="brand">CODEX GATE <strong>&middot;</strong> PRIZE WHEEL</div>
-      <div class="controls">
-        <button class="btn-icon" id="toggleConfigBtn">&#9881; SETTINGS</button>
-        <button class="btn-icon" id="fullscreenBtn">&#9654; FULLSCREEN</button>
+  <div class="app">
+    <div class="stage">
+      <div class="header">
+        <div class="brand">CODEX GATE <strong>&middot;</strong> PRIZE WHEEL</div>
+        <div class="controls">
+          <a class="btn-icon" href="/admin" target="_blank" rel="noopener">&#9881; ADMIN</a>
+          <button class="btn-icon" id="fullscreenBtn">&#9654; FULLSCREEN</button>
+        </div>
       </div>
-    </div>
 
-    <div class="wheel-area">
-      <div class="pointer"></div>
-      <div class="wheel-rotor" id="wheelRotor">
-        <svg class="wheel-svg" viewBox="-260 -260 520 520" id="wheelSvg" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="wheel-area">
+        <div class="pointer"></div>
+        <div class="wheel-rotor" id="wheelRotor">
+          <svg class="wheel-svg" viewBox="-260 -260 520 520" id="wheelSvg" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
       </div>
-    </div>
 
-    <div class="qr-section">
-      <div class="qr-box" id="qrBox"><span style="font-size:11px;color:var(--purple-lavender);text-align:center;">Loading QR...</span></div>
-      <div class="qr-label">SCAN TO PLAY</div>
-    </div>
-
-    <div class="actions-area">
-      <div class="actions">
-        <div class="result" id="result">Scan the QR code or press SPIN</div>
-        <div id="queueBadgeArea"></div>
-        <button class="spin-btn" id="spinBtn">SPIN</button>
-        <button class="manual-spin-btn" id="manualSpinBtn" style="display:none;">MANUAL SPIN</button>
-        <div class="hint-key">SPACEBAR &middot; SPIN &nbsp; F &middot; FULLSCREEN</div>
+      <div class="qr-section">
+        <div class="qr-box" id="qrBox"><span style="font-size:11px;color:var(--purple-lavender);text-align:center;">Loading QR...</span></div>
+        <div class="qr-label">SCAN TO PLAY</div>
       </div>
+
+      <div class="actions-area">
+        <div class="actions">
+          <div class="result" id="result">Scan the QR code or press SPIN</div>
+          <div id="queueBadgeArea"></div>
+          <button class="spin-btn" id="spinBtn">SPIN</button>
+          <button class="manual-spin-btn" id="manualSpinBtn" style="display:none;">MANUAL SPIN</button>
+          <div class="hint-key">SPACEBAR &middot; SPIN &nbsp; F &middot; FULLSCREEN</div>
+        </div>
+      </div>
+
+      <div class="conn-status" id="connStatus">CONNECTING&hellip;</div>
     </div>
   </div>
-
-  <!-- CONFIG PANEL -->
-  <div class="config" id="config">
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="prizes">PRIZES</button>
-      <button class="tab-btn" data-tab="stock">STOCK</button>
-      <button class="tab-btn" data-tab="queue">QUEUE <span class="badge" id="queueTabBadge" style="display:none;">0</span></button>
-      <button class="tab-btn" data-tab="history">HISTORY</button>
-    </div>
-
-    <!-- PRIZES TAB -->
-    <div class="tab-panel active" id="tab-prizes">
-      <h3>PRIZE LINEUP</h3>
-      <p class="hint">Each prize has a <strong>weight</strong> (higher = more likely). Set weight to 0 to skip without deleting.</p>
-      <div class="col-header">
-        <div>ICON</div>
-        <div style="text-align:left;">NAME</div>
-        <div>WEIGHT</div>
-        <div></div>
-      </div>
-      <div id="itemList"></div>
-      <button class="panel-btn" id="addBtn">+ ADD PRIZE</button>
-      <button class="panel-btn secondary" id="resetBtn">RESET TO DEFAULTS</button>
-    </div>
-
-    <!-- STOCK TAB -->
-    <div class="tab-panel" id="tab-stock">
-      <h3>STOCK MANAGEMENT</h3>
-      <p class="hint">Track how many of each prize remain. Items with 0 stock are automatically excluded from draws. Use <strong>-1</strong> for unlimited stock.</p>
-      <div class="stock-header">
-        <div></div>
-        <div style="text-align:left;">ITEM</div>
-        <div>STOCK</div>
-        <div>WON</div>
-      </div>
-      <div id="stockList"></div>
-    </div>
-
-    <!-- QUEUE TAB -->
-    <div class="tab-panel" id="tab-queue">
-      <h3>SPIN QUEUE</h3>
-      <p class="hint">People who registered via the QR form appear here. Click "Spin Next" to process them.</p>
-      <div id="queueList"></div>
-      <div class="manual-add-form">
-        <h4>ADD MANUALLY</h4>
-        <input id="manualName" placeholder="Name" />
-        <input id="manualCourse" placeholder="Course" />
-        <button class="panel-btn" id="manualAddBtn">+ ADD TO QUEUE</button>
-      </div>
-    </div>
-
-    <!-- HISTORY TAB -->
-    <div class="tab-panel" id="tab-history">
-      <h3>RECENT DRAWS</h3>
-      <p class="hint">The last 50 results, most recent first.</p>
-      <div id="historyList"></div>
-      <button class="panel-btn secondary" id="clearHistoryBtn">CLEAR HISTORY</button>
-    </div>
-
-    <!-- PASSWORD SECTION (bottom of history tab or its own area) -->
-    <div class="password-section" id="passwordSection">
-      <h4>SETTINGS PASSWORD</h4>
-      <input type="password" id="pwNew" placeholder="New password" />
-      <input type="password" id="pwConfirm" placeholder="Confirm password" />
-      <button class="panel-btn" id="pwSaveBtn">SET PASSWORD</button>
-      <button class="panel-btn secondary" id="pwRemoveBtn" style="display:none;">REMOVE PASSWORD</button>
-      <div class="pw-msg" id="pwMsg"></div>
-    </div>
-
-    <div class="server-bar">
-      <span class="server-status" id="serverStatus">SERVER: OFFLINE &mdash; local mode</span>
-      <button class="reconnect-btn" id="reconnectBtn" title="Reconnect to server">&#8635; RECONNECT</button>
-    </div>
-
-    <!-- SETTINGS LOCK OVERLAY -->
-    <div class="settings-lock" id="settingsLock" style="display:none;">
-      <div class="lock-icon">&#128274;</div>
-      <div class="lock-title">SETTINGS LOCKED</div>
-      <div class="lock-hint">Enter the password to access settings</div>
-      <input type="password" id="lockPasswordInput" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" />
-      <button class="lock-btn" id="lockUnlockBtn">UNLOCK</button>
-      <div class="lock-error" id="lockError"></div>
-      <button class="lock-forgot" id="lockForgotBtn">Forgot password?</button>
-    </div>
-  </div>
-  <div class="emoji-picker" id="emojiPicker"></div>
-</div>
 </div>
 
 <!-- ===== REGISTER VIEW (mobile) ===== -->
 <div id="registerView" style="display:none;">
-<div class="register-view">
-  <div class="register-card" id="registerFormCard">
-    <div class="r-brand">CODEX GATE</div>
-    <div class="r-title">Spin the Prize Wheel!</div>
-    <form id="registerForm" autocomplete="off">
-      <label>YOUR NAME</label>
-      <input id="regName" placeholder="e.g. John Doe" required />
-      <label>COURSE / PROGRAMME</label>
-      <input id="regCourse" placeholder="e.g. Computer Science" required />
-      <label>PHONE NUMBER</label>
-      <input id="regPhone" type="tel" placeholder="e.g. 012-345-6789" required />
-      <label>EMAIL</label>
-      <input id="regEmail" type="email" placeholder="e.g. john@example.com" required />
-      <button type="submit" class="register-submit" id="regSubmitBtn">REGISTER & SPIN</button>
-      <div class="register-error" id="regError"></div>
-    </form>
-  </div>
-  <div class="register-card register-success" id="registerSuccess">
-    <div class="rs-icon">&#9989;</div>
-    <div class="rs-title">You're in the queue!</div>
-    <div class="rs-position" id="rsPosition">Position: #1</div>
-    <div class="rs-status" id="rsStatus">Watch the big screen for your turn...</div>
-    <div class="rs-prize" id="rsPrize">
-      <div class="rp-icon" id="rsPrizeIcon"></div>
-      <div class="rp-label">YOU WON</div>
-      <div class="rp-name" id="rsPrizeName"></div>
+  <div class="register-view">
+    <div class="register-card" id="registerFormCard">
+      <div class="r-brand">CODEX GATE</div>
+      <div class="r-title">Spin the Prize Wheel!</div>
+      <form id="registerForm" autocomplete="off">
+        <label>YOUR NAME</label>
+        <input id="regName" placeholder="e.g. John Doe" required />
+        <label>COURSE / PROGRAMME</label>
+        <input id="regCourse" placeholder="e.g. Computer Science" required />
+        <label>PHONE NUMBER</label>
+        <input id="regPhone" type="tel" placeholder="e.g. 012-345-6789" required />
+        <label>EMAIL</label>
+        <input id="regEmail" type="email" placeholder="e.g. john@example.com" required />
+        <button type="submit" class="register-submit" id="regSubmitBtn">REGISTER &amp; SPIN</button>
+        <div class="register-error" id="regError"></div>
+      </form>
+    </div>
+    <div class="register-card register-success" id="registerSuccess">
+      <div class="rs-icon">&#9989;</div>
+      <div class="rs-title">You're in the queue!</div>
+      <div class="rs-position" id="rsPosition">Position: #1</div>
+      <div class="rs-status" id="rsStatus">Watch the big screen for your turn&hellip;</div>
+      <div class="rs-prize" id="rsPrize">
+        <div class="rp-icon" id="rsPrizeIcon"></div>
+        <div class="rp-label">YOU WON</div>
+        <div class="rp-name" id="rsPrizeName"></div>
+      </div>
     </div>
   </div>
-</div>
 </div>
 
 <!-- ===== WINNER OVERLAY ===== -->
@@ -986,24 +476,11 @@
 </div>
 
 <script>
-// ===== DEFAULTS =====
-const DEFAULT_ITEMS = [
-  { icon: '\u{1F455}', name: 'T-Shirt',       weight: 1,  stock: 5,   won: 0 },
-  { icon: '\u{1F392}', name: 'Backpack',      weight: 2,  stock: 3,   won: 0 },
-  { icon: '\u{1F58A}\uFE0F', name: 'Pen',     weight: 18, stock: 100, won: 0 },
-  { icon: '\u{1F4D3}', name: 'Notebook',      weight: 14, stock: 50,  won: 0 },
-  { icon: '\u{1FAE0}', name: 'Sticker',       weight: 22, stock: -1,  won: 0 },
-  { icon: '\u{1FAD5}', name: 'Chocolate',     weight: 20, stock: 80,  won: 0 },
-  { icon: '\u{1F964}', name: 'Bottle',        weight: 8,  stock: 20,  won: 0 },
-  { icon: '\u{1F381}', name: 'Mystery Prize', weight: 15, stock: 10,  won: 0 },
-];
-
 const COLORS = {
   deep: '#3D1B6B', mid: '#7B43B8', light: '#E5D6F2', pale: '#F5F0FB',
   lavender: '#9B7BC4', darker: '#5B2C9C', number: '#C8B0E0', white: '#FFFFFF',
 };
 
-// ===== ROUTING =====
 const urlParams = new URLSearchParams(window.location.search);
 const IS_REGISTER = urlParams.has('register');
 
@@ -1014,207 +491,47 @@ if (IS_REGISTER) {
   document.getElementById('registerView').style.display = 'none';
 }
 
-// ===== STATE =====
+const $ = id => document.getElementById(id);
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeXml(s) { return escapeHtml(s); }
+
 let items = [];
-let drawHistory = [];
 let spinQueue = [];
 let isSpinning = false;
 let currentRotation = 0;
 let currentPerson = null;
-let serverOnline = false;
-let pollTimer = null;
+let connectedOnce = false;
 
-// ===== DOM (display) =====
-const $ = id => document.getElementById(id);
 const wheelRotor = $('wheelRotor');
 const wheelSvg = $('wheelSvg');
-const itemList = $('itemList');
 const spinBtn = $('spinBtn');
 const manualSpinBtn = $('manualSpinBtn');
 const resultEl = $('result');
-const historyList = $('historyList');
-const stockListEl = $('stockList');
-const queueListEl = $('queueList');
 const queueBadgeArea = $('queueBadgeArea');
-const queueTabBadge = $('queueTabBadge');
-const serverStatusEl = $('serverStatus');
-const addBtn = $('addBtn');
-const resetBtn = $('resetBtn');
-const clearBtn = $('clearHistoryBtn');
-const toggleConfigBtn = $('toggleConfigBtn');
 const fullscreenBtn = $('fullscreenBtn');
-const app = $('app');
 const winnerOverlay = $('winnerOverlay');
 const winnerIcon = $('winnerIcon');
 const winnerPerson = $('winnerPerson');
 const winnerPrizeName = $('winnerPrizeName');
 const winnerClose = $('winnerClose');
 const qrBox = $('qrBox');
-const reconnectBtn = $('reconnectBtn');
-const settingsLock = $('settingsLock');
-const lockPasswordInput = $('lockPasswordInput');
-const lockUnlockBtn = $('lockUnlockBtn');
-const lockError = $('lockError');
-const passwordSection = $('passwordSection');
-let settingsUnlocked = false;
-
-// ===== HELPERS =====
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeAttr(s) { return escapeHtml(s); }
-function escapeXml(s) { return escapeHtml(s); }
+const connStatus = $('connStatus');
 
 function getActiveItems() {
   return items.filter(i => i.weight > 0 && (i.stock === -1 || i.stock > 0));
 }
 
-// ===== EMOJI SUGGESTIONS =====
-const EMOJI_MAP = {
-  'shirt': ['\u{1F455}','\u{1F454}','\u{1F45A}'], 't-shirt': ['\u{1F455}'], tshirt: ['\u{1F455}'], tee: ['\u{1F455}'],
-  polo: ['\u{1F455}'], jersey: ['\u{1F455}'], hoodie: ['\u{1F9E5}'], jacket: ['\u{1F9E5}'],
-  cap: ['\u{1F9E2}'], hat: ['\u{1F9E2}','\u{1F3A9}'], bag: ['\u{1F45C}','\u{1F392}','\u{1F6CD}\uFE0F'],
-  backpack: ['\u{1F392}'], pen: ['\u{1F58A}\uFE0F','\u{1F58D}\uFE0F','\u{270F}\uFE0F','\u{1F4DD}'],
-  pencil: ['\u{270F}\uFE0F'], notebook: ['\u{1F4D3}','\u{1F4D4}','\u{1F4D2}','\u{1F4DA}'],
-  book: ['\u{1F4D5}','\u{1F4DA}','\u{1F4D6}'], sticker: ['\u{1FAE0}','\u{2B50}','\u{1F31F}','\u{1F4CB}'],
-  chocolate: ['\u{1F36B}','\u{1FAD5}','\u{1F370}'], candy: ['\u{1F36C}','\u{1F36D}','\u{1F36E}'],
-  sweet: ['\u{1F36C}','\u{1F36B}'], snack: ['\u{1F36A}','\u{1F36B}','\u{1F37F}'],
-  bottle: ['\u{1F964}','\u{1FAD9}','\u{1F375}','\u{2615}'], water: ['\u{1F4A7}','\u{1F964}','\u{1FAD9}'],
-  drink: ['\u{1F964}','\u{1F379}','\u{2615}','\u{1F9CB}'], coffee: ['\u{2615}','\u{1F375}'],
-  tea: ['\u{1F375}','\u{2615}'], mug: ['\u{2615}','\u{1F375}'],
-  mystery: ['\u{1F381}','\u{2753}','\u{1F52E}','\u{1F3B0}'], prize: ['\u{1F381}','\u{1F3C6}','\u{1F947}','\u{2B50}'],
-  gift: ['\u{1F381}','\u{1F380}','\u{1F383}'], surprise: ['\u{1F381}','\u{1F389}','\u{1F38A}'],
-  phone: ['\u{1F4F1}','\u{260E}\uFE0F','\u{1F4DE}'], mobile: ['\u{1F4F1}'],
-  laptop: ['\u{1F4BB}'], computer: ['\u{1F4BB}','\u{1F5A5}\uFE0F'], tablet: ['\u{1F4F1}','\u{1F4BB}'],
-  headphone: ['\u{1F3A7}'], earphone: ['\u{1F3A7}'], airpod: ['\u{1F3A7}'],
-  speaker: ['\u{1F50A}','\u{1F4E2}'], charger: ['\u{1F50C}','\u{1F50B}'], power: ['\u{1F50B}','\u{26A1}'],
-  watch: ['\u{231A}','\u{1F4F1}'], clock: ['\u{23F0}','\u{231A}'],
-  shoe: ['\u{1F45F}','\u{1F462}','\u{1F97E}'], sneaker: ['\u{1F45F}'], slipper: ['\u{1FA74}'],
-  sock: ['\u{1F9E6}'], glasses: ['\u{1F453}','\u{1F576}\uFE0F'], sunglasses: ['\u{1F576}\uFE0F'],
-  umbrella: ['\u{2602}\uFE0F','\u{1F302}'], key: ['\u{1F511}','\u{1F5DD}\uFE0F'],
-  keychain: ['\u{1F511}','\u{1F5DD}\uFE0F'],
-  car: ['\u{1F697}','\u{1F698}','\u{1F3CE}\uFE0F','\u{1F699}'], bike: ['\u{1F6B2}','\u{1F3CD}\uFE0F'],
-  money: ['\u{1F4B0}','\u{1F4B5}','\u{1F4B8}'], cash: ['\u{1F4B5}','\u{1F4B0}','\u{1F4B8}'],
-  voucher: ['\u{1F3AB}','\u{1F4B3}','\u{1F9FE}'], coupon: ['\u{1F3AB}','\u{1F9FE}'],
-  ticket: ['\u{1F3AB}','\u{1F39F}\uFE0F'], card: ['\u{1F4B3}','\u{1F3AB}'],
-  food: ['\u{1F354}','\u{1F355}','\u{1F32E}','\u{1F35C}'], pizza: ['\u{1F355}'],
-  burger: ['\u{1F354}'], noodle: ['\u{1F35C}'], rice: ['\u{1F35A}','\u{1F35B}'],
-  cake: ['\u{1F382}','\u{1F370}','\u{1F9C1}'], cookie: ['\u{1F36A}'], donut: ['\u{1F369}'],
-  ice: ['\u{1F366}','\u{1F368}'], cream: ['\u{1F366}','\u{1F368}'],
-  toy: ['\u{1F9F8}','\u{1FA80}','\u{1F3B2}','\u{1F3AE}'], game: ['\u{1F3AE}','\u{1F3B2}','\u{1F579}\uFE0F'],
-  ball: ['\u{26BD}','\u{1F3C0}','\u{1F3BE}','\u{26BE}'], sport: ['\u{26BD}','\u{1F3C0}','\u{1F3C6}'],
-  medal: ['\u{1F3C5}','\u{1F947}','\u{1F948}','\u{1F949}'], trophy: ['\u{1F3C6}','\u{1F947}'],
-  star: ['\u{2B50}','\u{1F31F}','\u{1F4AB}'], heart: ['\u{2764}\uFE0F','\u{1F49D}','\u{1F496}'],
-  flower: ['\u{1F33B}','\u{1F337}','\u{1F338}','\u{1F490}'], plant: ['\u{1F331}','\u{1F33F}','\u{1FAB4}'],
-  lamp: ['\u{1F4A1}','\u{1F6CB}\uFE0F'], light: ['\u{1F4A1}','\u{1F526}'],
-  camera: ['\u{1F4F7}','\u{1F4F8}','\u{1F3A5}'], photo: ['\u{1F4F7}','\u{1F5BC}\uFE0F'],
-  music: ['\u{1F3B5}','\u{1F3B6}','\u{1F3A4}','\u{1F3B8}'], guitar: ['\u{1F3B8}'],
-  drum: ['\u{1F941}'], piano: ['\u{1F3B9}'],
-  towel: ['\u{1F9FB}'], tissue: ['\u{1F9FB}','\u{1F9F4}'],
-  pillow: ['\u{1F6CF}\uFE0F'], blanket: ['\u{1F6CF}\uFE0F'],
-  paint: ['\u{1F3A8}','\u{1F58C}\uFE0F'], art: ['\u{1F3A8}','\u{1F5BC}\uFE0F'],
-  crayon: ['\u{1F58D}\uFE0F','\u{1F3A8}'], marker: ['\u{1F58D}\uFE0F','\u{1F58A}\uFE0F'],
-  usb: ['\u{1F4BE}','\u{1F4BF}'], drive: ['\u{1F4BE}','\u{1F4BF}'],
-  mouse: ['\u{1F5B1}\uFE0F'], keyboard: ['\u{2328}\uFE0F'],
-  wifi: ['\u{1F4F6}'], bluetooth: ['\u{1F4F6}'],
-  mask: ['\u{1F637}','\u{1F3AD}'], sanitizer: ['\u{1F9F4}'],
-  perfume: ['\u{1F9F4}'], lotion: ['\u{1F9F4}'],
-  ring: ['\u{1F48D}'], necklace: ['\u{1F4FF}'], bracelet: ['\u{1F4FF}'],
-  diamond: ['\u{1F48E}'], gem: ['\u{1F48E}'], jewel: ['\u{1F48E}','\u{1F48D}'],
-};
-
-const GENERAL_EMOJIS = [
-  '\u{1F381}','\u{1F3C6}','\u{2B50}','\u{1F389}','\u{1F380}',
-  '\u{1F455}','\u{1F392}','\u{1F58A}\uFE0F','\u{1F4D3}','\u{1F36B}',
-  '\u{1F964}','\u{1F3A7}','\u{1F4BB}','\u{1F4F1}','\u{1F697}',
-  '\u{1F4B0}','\u{1F3AB}','\u{1F453}','\u{1F511}','\u{1F9F8}',
-  '\u{1F3AE}','\u{26BD}','\u{1F4F7}','\u{1F3B5}','\u{1F3A8}',
-  '\u{1F48E}','\u{1F354}','\u{1F370}','\u{2615}','\u{1F33B}',
-];
-
-function suggestEmojis(name) {
-  const lower = (name || '').toLowerCase().trim();
-  if (!lower) return GENERAL_EMOJIS.slice(0, 18);
-  const found = new Set();
-  // Check each keyword against the name
-  for (const [keyword, emojis] of Object.entries(EMOJI_MAP)) {
-    if (lower.includes(keyword)) {
-      emojis.forEach(e => found.add(e));
-    }
-  }
-  // Also check individual words
-  for (const word of lower.split(/\s+/)) {
-    if (EMOJI_MAP[word]) EMOJI_MAP[word].forEach(e => found.add(e));
-  }
-  const result = [...found];
-  // Pad with general emojis if we don't have enough
-  if (result.length < 12) {
-    for (const e of GENERAL_EMOJIS) {
-      if (!found.has(e)) result.push(e);
-      if (result.length >= 18) break;
-    }
-  }
-  return result.slice(0, 18);
-}
-
-function autoSuggestEmoji(name) {
-  const lower = (name || '').toLowerCase().trim();
-  for (const [keyword, emojis] of Object.entries(EMOJI_MAP)) {
-    if (lower.includes(keyword)) return emojis[0];
-  }
-  return null;
-}
-
-// Emoji picker state
-let pickerTarget = null;
-const emojiPicker = $('emojiPicker');
-
-function showEmojiPicker(iconInput, itemIndex) {
-  pickerTarget = { input: iconInput, index: itemIndex };
-  const name = items[itemIndex].name;
-  const emojis = suggestEmojis(name);
-
-  let html = '<div class="ep-label">SUGGESTED</div><div class="ep-grid">';
-  emojis.forEach(e => {
-    html += `<button class="ep-btn" data-emoji="${escapeAttr(e)}" type="button">${e}</button>`;
-  });
-  html += '</div>';
-  emojiPicker.innerHTML = html;
-
-  // Position near the icon input
-  const rect = iconInput.getBoundingClientRect();
-  const configRect = $('config').getBoundingClientRect();
-  emojiPicker.style.top = (rect.bottom + 4) + 'px';
-  emojiPicker.style.left = Math.max(configRect.left + 8, rect.left) + 'px';
-  emojiPicker.classList.add('show');
-
-  emojiPicker.querySelectorAll('.ep-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const emoji = btn.dataset.emoji;
-      items[pickerTarget.index].icon = emoji;
-      pickerTarget.input.value = emoji;
-      emojiPicker.classList.remove('show');
-      saveConfig();
-      drawWheel();
-      renderStock();
-    });
-  });
-}
-
-// Close picker when clicking outside
-document.addEventListener('click', (e) => {
-  if (emojiPicker && !emojiPicker.contains(e.target) && !e.target.classList.contains('icon')) {
-    emojiPicker.classList.remove('show');
-  }
-});
-
-// ===== WHEEL RENDERING =====
 function drawWheel() {
   if (IS_REGISTER) return;
   wheelSvg.innerHTML = '';
   const active = getActiveItems();
   const n = active.length;
-  if (n === 0) { wheelSvg.innerHTML = '<text text-anchor="middle" fill="#9B7BC4" font-size="18">No prizes available</text>'; return; }
+  if (n === 0) {
+    wheelSvg.innerHTML = '<text text-anchor="middle" fill="#9B7BC4" font-size="18">No prizes available</text>';
+    return;
+  }
 
   const R_OUTER = 240, R_RIM = 230, R_INNER = 200, R_HUB = 38, R_CABIN = 215;
   const CABIN_W = Math.min(74, 1100 / n);
@@ -1251,175 +568,9 @@ function drawWheel() {
     g += `</g>`;
   }
   wheelSvg.innerHTML = g;
-  applyRotation();
+  wheelRotor.style.transform = `rotate(${currentRotation}deg)`;
 }
 
-function applyRotation() {
-  if (wheelRotor) wheelRotor.style.transform = `rotate(${currentRotation}deg)`;
-}
-
-// ===== CONFIG PANEL: PRIZES TAB =====
-function renderItems() {
-  if (IS_REGISTER || !itemList) return;
-  itemList.innerHTML = '';
-  items.forEach((it, i) => {
-    const row = document.createElement('div');
-    row.className = 'item-row';
-    row.innerHTML = `
-      <input class="icon" data-i="${i}" data-k="icon" value="${escapeAttr(it.icon)}" maxlength="4"/>
-      <input data-i="${i}" data-k="name" value="${escapeAttr(it.name)}" placeholder="Prize name"/>
-      <input class="weight" type="number" min="0" max="999" data-i="${i}" data-k="weight" value="${it.weight}"/>
-      <button class="remove" data-i="${i}">&times;</button>`;
-    itemList.appendChild(row);
-  });
-  itemList.querySelectorAll('input').forEach(inp => {
-    // Emoji picker on icon click
-    if (inp.classList.contains('icon')) {
-      inp.addEventListener('click', (e) => {
-        e.preventDefault();
-        showEmojiPicker(inp, +inp.dataset.i);
-      });
-      inp.addEventListener('focus', (e) => {
-        e.preventDefault();
-        showEmojiPicker(inp, +inp.dataset.i);
-      });
-    }
-    inp.addEventListener('input', e => {
-      const i = +e.target.dataset.i, k = e.target.dataset.k;
-      if (k === 'weight') items[i][k] = Math.max(0, parseInt(e.target.value, 10) || 0);
-      else items[i][k] = e.target.value;
-      // Auto-suggest emoji when name changes and icon is still default
-      if (k === 'name') {
-        const suggested = autoSuggestEmoji(e.target.value);
-        if (suggested && items[i].icon === '\u{1F381}') {
-          items[i].icon = suggested;
-          const iconInput = itemList.querySelector(`input.icon[data-i="${i}"]`);
-          if (iconInput) iconInput.value = suggested;
-        }
-      }
-      saveConfig();
-      clearTimeout(window._wd);
-      window._wd = setTimeout(() => { drawWheel(); renderStock(); }, 100);
-    });
-  });
-  itemList.querySelectorAll('.remove').forEach(btn => {
-    btn.addEventListener('click', () => {
-      items.splice(+btn.dataset.i, 1);
-      renderItems(); drawWheel(); renderStock(); saveConfig();
-    });
-  });
-}
-
-// ===== CONFIG PANEL: STOCK TAB =====
-function renderStock() {
-  if (IS_REGISTER || !stockListEl) return;
-  stockListEl.innerHTML = '';
-  items.forEach((it, i) => {
-    const row = document.createElement('div');
-    row.className = 'stock-row' + (it.stock === 0 ? ' out-of-stock' : '');
-    const stockVal = it.stock === -1 ? -1 : it.stock;
-    row.innerHTML = `
-      <div class="stock-icon">${escapeHtml(it.icon)}</div>
-      <div class="stock-name">${escapeHtml(it.name)}</div>
-      <input type="number" min="-1" max="9999" data-i="${i}" value="${stockVal}" title="-1 = unlimited"/>
-      <div class="won-count">${it.won || 0}</div>`;
-    stockListEl.appendChild(row);
-  });
-  stockListEl.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const i = +e.target.dataset.i;
-      const v = parseInt(e.target.value, 10);
-      items[i].stock = isNaN(v) ? 0 : Math.max(-1, v);
-      saveConfig();
-      clearTimeout(window._sd);
-      window._sd = setTimeout(drawWheel, 100);
-    });
-  });
-}
-
-// ===== CONFIG PANEL: QUEUE TAB =====
-function renderQueue() {
-  if (IS_REGISTER || !queueListEl) return;
-  queueListEl.innerHTML = '';
-  if (spinQueue.length === 0) {
-    queueListEl.innerHTML = '<div class="queue-empty">No one in queue. Share the QR code!</div>';
-  } else {
-    spinQueue.forEach((entry, i) => {
-      const div = document.createElement('div');
-      div.className = 'queue-entry';
-      div.innerHTML = `
-        <div><div class="q-name">${escapeHtml(entry.name)}</div><div class="q-course">${escapeHtml(entry.course || '')}</div></div>
-        <button class="q-remove" data-i="${i}" title="Remove">&times;</button>`;
-      queueListEl.appendChild(div);
-    });
-    queueListEl.querySelectorAll('.q-remove').forEach(btn => {
-      btn.addEventListener('click', () => {
-        spinQueue.splice(+btn.dataset.i, 1);
-        renderQueue(); updateSpinButton(); saveConfig();
-      });
-    });
-  }
-  updateSpinButton();
-  // update badge
-  if (queueTabBadge) {
-    if (spinQueue.length > 0) {
-      queueTabBadge.textContent = spinQueue.length;
-      queueTabBadge.style.display = '';
-    } else {
-      queueTabBadge.style.display = 'none';
-    }
-  }
-}
-
-function updateSpinButton() {
-  if (IS_REGISTER) return;
-  if (spinQueue.length > 0) {
-    const next = spinQueue[0];
-    spinBtn.textContent = `SPIN \u25B8 ${next.name.toUpperCase()}`;
-    spinBtn.classList.add('has-queue');
-    manualSpinBtn.style.display = '';
-    if (queueBadgeArea) queueBadgeArea.innerHTML = `<span class="queue-badge">${spinQueue.length} in queue</span>`;
-  } else {
-    spinBtn.textContent = 'SPIN';
-    spinBtn.classList.remove('has-queue');
-    manualSpinBtn.style.display = 'none';
-    if (queueBadgeArea) queueBadgeArea.innerHTML = '';
-  }
-}
-
-// ===== CONFIG PANEL: HISTORY TAB =====
-function renderHistory() {
-  if (IS_REGISTER || !historyList) return;
-  historyList.innerHTML = '';
-  if (drawHistory.length === 0) {
-    historyList.innerHTML = '<div class="history-empty">No draws yet.</div>';
-    return;
-  }
-  drawHistory.slice().reverse().forEach(e => {
-    const div = document.createElement('div');
-    div.className = 'history-entry';
-    div.innerHTML = `
-      <div class="h-top"><span class="h-prize">${escapeHtml(e.icon)} ${escapeHtml(e.name)}</span><span class="h-time">${escapeHtml(e.time)}</span></div>
-      ${e.person ? `<div class="h-person">Won by: ${escapeHtml(e.person)}</div>` : ''}`;
-    historyList.appendChild(div);
-  });
-}
-
-// ===== TABS =====
-function initTabs() {
-  if (IS_REGISTER) return;
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      const panel = $('tab-' + btn.dataset.tab);
-      if (panel) panel.classList.add('active');
-    });
-  });
-}
-
-// ===== WEIGHTED PICK (active items only) =====
 function weightedPick() {
   const active = getActiveItems();
   if (active.length === 0) return -1;
@@ -1433,11 +584,26 @@ function weightedPick() {
   return active.length - 1;
 }
 
-// ===== SPIN =====
-function spin(person) {
+function updateSpinButton() {
+  if (IS_REGISTER) return;
+  if (spinQueue.length > 0) {
+    const next = spinQueue[0];
+    spinBtn.textContent = `SPIN ▸ ${(next.name || '').toUpperCase()}`;
+    spinBtn.classList.add('has-queue');
+    manualSpinBtn.style.display = '';
+    queueBadgeArea.innerHTML = `<span class="queue-badge">${spinQueue.length} in queue</span>`;
+  } else {
+    spinBtn.textContent = 'SPIN';
+    spinBtn.classList.remove('has-queue');
+    manualSpinBtn.style.display = 'none';
+    queueBadgeArea.innerHTML = '';
+  }
+}
+
+async function spin(person) {
   if (isSpinning || IS_REGISTER) return;
   const active = getActiveItems();
-  if (active.length === 0) { resultEl.textContent = 'No prizes available (check stock/weight).'; return; }
+  if (active.length === 0) { resultEl.textContent = 'No prizes available.'; return; }
 
   const winIdx = weightedPick();
   if (winIdx < 0) { resultEl.textContent = 'No prizes with weight > 0.'; return; }
@@ -1446,7 +612,7 @@ function spin(person) {
   spinBtn.disabled = true;
   manualSpinBtn.disabled = true;
   currentPerson = person || null;
-  resultEl.textContent = person ? `Spinning for ${person.name}\u2026` : 'Spinning\u2026';
+  resultEl.textContent = person ? `Spinning for ${person.name}…` : 'Spinning…';
   resultEl.className = 'result';
   winnerOverlay.classList.remove('show');
 
@@ -1461,66 +627,26 @@ function spin(person) {
   currentRotation += 6 * 360 + delta;
 
   wheelRotor.classList.add('spinning');
-  applyRotation();
+  wheelRotor.style.transform = `rotate(${currentRotation}deg)`;
 
-  setTimeout(() => {
+  const winner = active[winIdx];
+  setTimeout(async () => {
     isSpinning = false;
     spinBtn.disabled = false;
     manualSpinBtn.disabled = false;
     wheelRotor.classList.remove('spinning');
 
-    const w = active[winIdx];
-    // Find the original item to decrement stock
-    const origIdx = items.findIndex(it => it === w);
-
-    // Decrement stock
-    if (origIdx !== -1 && items[origIdx].stock > 0) {
-      items[origIdx].stock--;
-      items[origIdx].won = (items[origIdx].won || 0) + 1;
-    } else if (origIdx !== -1 && items[origIdx].stock === -1) {
-      items[origIdx].won = (items[origIdx].won || 0) + 1;
-    }
-
-    // Show result
     const personName = currentPerson ? currentPerson.name : null;
     if (personName) {
-      resultEl.innerHTML = `\u{1F389} <strong>${escapeHtml(personName)}</strong> won <strong>${escapeHtml(w.icon)} ${escapeHtml(w.name)}</strong>`;
+      resultEl.innerHTML = `\u{1F389} <strong>${escapeHtml(personName)}</strong> won <strong>${escapeHtml(winner.icon)} ${escapeHtml(winner.name)}</strong>`;
     } else {
-      resultEl.innerHTML = `\u{1F389} <strong>${escapeHtml(w.icon)} ${escapeHtml(w.name)}</strong>`;
+      resultEl.innerHTML = `\u{1F389} <strong>${escapeHtml(winner.icon)} ${escapeHtml(winner.name)}</strong>`;
     }
     resultEl.className = 'result winner';
-
-    showWinner(w, personName);
-
-    // Record history
-    drawHistory.push({
-      icon: w.icon,
-      name: w.name,
-      person: personName || null,
-      time: new Date().toLocaleTimeString()
-    });
-    if (drawHistory.length > 50) drawHistory.shift();
-
-    // Report result to server
-    if (serverOnline && currentPerson) {
-      reportResult(currentPerson, w);
-    }
-
+    showWinner(winner, personName);
+    reportResult(currentPerson, winner);
     currentPerson = null;
-    renderHistory();
-    renderStock();
-    renderQueue();
-    drawWheel();
-    saveConfig();
   }, 5650);
-}
-
-function spinFromQueue() {
-  if (spinQueue.length === 0) { spin(null); return; }
-  const person = spinQueue.shift();
-  renderQueue();
-  saveConfig();
-  spin(person);
 }
 
 function showWinner(prize, personName) {
@@ -1535,22 +661,83 @@ function showWinner(prize, personName) {
   winnerOverlay.classList.add('show');
 }
 
-// ===== QR CODE =====
+async function reportResult(person, prize) {
+  try {
+    await fetch('/api/result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: person ? person.id : null,
+        itemId: prize.id,
+        prize: { icon: prize.icon, name: prize.name }
+      })
+    });
+    pollItems();
+    pollQueue();
+  } catch { /* ignore */ }
+}
+
+async function pollItems() {
+  try {
+    const res = await fetch('/api/items', { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return false;
+    const data = await res.json();
+    items = (data.items || []).map(i => ({
+      id: i.id,
+      icon: i.icon || '\u{1F381}',
+      name: i.name || '',
+      weight: i.weight || 0,
+      stock: typeof i.stock === 'number' ? i.stock : -1,
+      won: i.won || 0,
+    }));
+    if (!isSpinning) drawWheel();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function pollQueue() {
+  try {
+    const res = await fetch('/api/queue', { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!isSpinning) {
+      spinQueue = data.queue || [];
+      updateSpinButton();
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function updateConnStatus(ok) {
+  if (ok) {
+    connStatus.textContent = 'ONLINE';
+    connStatus.className = 'conn-status online';
+    connectedOnce = true;
+  } else {
+    connStatus.textContent = connectedOnce ? 'RECONNECTING…' : 'CONNECTING…';
+    connStatus.className = 'conn-status';
+  }
+}
+
+async function pollLoop() {
+  const [a, b] = await Promise.all([pollItems(), pollQueue()]);
+  updateConnStatus(a && b);
+  setTimeout(pollLoop, 3000);
+}
+
 function generateQR() {
   if (IS_REGISTER || !qrBox) return;
   const base = window.location.origin + window.location.pathname;
   const registerUrl = base + '?register';
 
-  if (window.location.protocol === 'file:') {
-    qrBox.innerHTML = '<span style="font-size:10px;color:var(--purple-lavender);text-align:center;padding:4px;">Serve with server.js for QR to work</span>';
-    return;
-  }
-
   if (window._qrUnavailable || typeof qrcode === 'undefined') {
     qrBox.innerHTML = `<span style="font-size:9px;color:var(--purple-lavender);text-align:center;padding:4px;word-break:break-all;">${escapeHtml(registerUrl)}</span>`;
     return;
   }
-
   try {
     const qr = qrcode(0, 'M');
     qr.addData(registerUrl);
@@ -1567,43 +754,12 @@ function generateQR() {
     }
     svg += '</svg>';
     qrBox.innerHTML = svg;
-  } catch (e) {
+  } catch {
     qrBox.innerHTML = `<span style="font-size:9px;color:var(--purple-lavender);text-align:center;padding:4px;">QR error</span>`;
   }
 }
 
-// ===== SERVER COMMUNICATION =====
-async function checkServer() {
-  if (IS_REGISTER) return;
-  try {
-    const res = await fetch('/api/queue', { signal: AbortSignal.timeout(2000) });
-    if (res.ok) {
-      serverOnline = true;
-      const data = await res.json();
-      // Don't overwrite queue while spinning — avoids re-adding the current person
-      if (!isSpinning) {
-        spinQueue = data.queue || [];
-        renderQueue();
-      }
-      if (serverStatusEl) {
-        serverStatusEl.textContent = 'SERVER: ONLINE';
-        serverStatusEl.className = 'server-status online';
-      }
-    } else {
-      serverOnline = false;
-    }
-  } catch {
-    serverOnline = false;
-    if (serverStatusEl) {
-      serverStatusEl.textContent = 'SERVER: OFFLINE \u2014 local mode';
-      serverStatusEl.className = 'server-status';
-    }
-  }
-  pollTimer = setTimeout(checkServer, 3000);
-}
-
 async function fetchNextFromServer() {
-  if (!serverOnline) return null;
   try {
     const res = await fetch('/api/queue/next', { method: 'POST' });
     if (res.ok) return await res.json();
@@ -1611,47 +767,43 @@ async function fetchNextFromServer() {
   return null;
 }
 
-async function reportResult(person, prize) {
-  if (!serverOnline) return;
-  try {
-    await fetch('/api/result', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: person.id, prize: { icon: prize.icon, name: prize.name } })
-    });
-  } catch { /* ignore */ }
+function initDisplayEvents() {
+  if (IS_REGISTER) return;
+
+  spinBtn.addEventListener('click', async () => {
+    if (spinQueue.length > 0) {
+      const person = await fetchNextFromServer();
+      if (person) {
+        spinQueue = spinQueue.filter(q => q.id !== person.id);
+        updateSpinButton();
+        spin(person);
+      } else {
+        spin(null);
+      }
+    } else {
+      spin(null);
+    }
+  });
+  manualSpinBtn.addEventListener('click', () => spin(null));
+  winnerClose.addEventListener('click', () => winnerOverlay.classList.remove('show'));
+  fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if (e.code === 'Space') { e.preventDefault(); if (!isSpinning) spinBtn.click(); }
+    else if (e.code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
+    else if (e.code === 'Escape') { winnerOverlay.classList.remove('show'); }
+  });
 }
 
-// ===== PERSISTENCE =====
-function saveConfig() {
-  try {
-    localStorage.setItem('codexWheel_items', JSON.stringify(items));
-    localStorage.setItem('codexWheel_history', JSON.stringify(drawHistory));
-    if (!serverOnline) localStorage.setItem('codexWheel_queue', JSON.stringify(spinQueue));
-  } catch { /* ignore */ }
-}
-
-function loadConfig() {
-  try {
-    const i = localStorage.getItem('codexWheel_items');
-    const h = localStorage.getItem('codexWheel_history');
-    const q = localStorage.getItem('codexWheel_queue');
-    items = i ? JSON.parse(i) : JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-    // Ensure stock/won fields exist on loaded items
-    items.forEach(it => {
-      if (it.stock === undefined) it.stock = -1;
-      if (it.won === undefined) it.won = 0;
-    });
-    drawHistory = h ? JSON.parse(h) : [];
-    spinQueue = q ? JSON.parse(q) : [];
-  } catch {
-    items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-    drawHistory = [];
-    spinQueue = [];
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  } else {
+    document.exitFullscreen?.();
   }
 }
 
-// ===== REGISTRATION FORM LOGIC =====
 function initRegisterForm() {
   if (!IS_REGISTER) return;
   const form = $('registerForm');
@@ -1664,7 +816,7 @@ function initRegisterForm() {
     e.preventDefault();
     errorEl.style.display = 'none';
     submitBtn.disabled = true;
-    submitBtn.textContent = 'SUBMITTING\u2026';
+    submitBtn.textContent = 'SUBMITTING…';
 
     const data = {
       name: $('regName').value.trim(),
@@ -1690,15 +842,12 @@ function initRegisterForm() {
       if (!res.ok) throw new Error('Server error');
       const result = await res.json();
 
-      // Show success
       formCard.style.display = 'none';
       successCard.style.display = 'block';
       $('rsPosition').textContent = `Position: #${result.position}`;
-
-      // Poll for status
       if (result.id) pollRegistrationStatus(result.id);
-    } catch (err) {
-      errorEl.textContent = 'Could not connect to the prize wheel. Please try again or ask the operator.';
+    } catch {
+      errorEl.textContent = 'Could not connect. Please try again or ask the operator.';
       errorEl.style.display = '';
       submitBtn.disabled = false;
       submitBtn.textContent = 'REGISTER & SPIN';
@@ -1721,257 +870,25 @@ async function pollRegistrationStatus(id) {
         $('rsPrizeIcon').textContent = data.prize.icon;
         $('rsPrizeName').textContent = data.prize.name;
         posEl.textContent = '';
-        return; // stop polling
+        return;
       } else if (data.status === 'spinning') {
-        statusEl.textContent = 'Your turn! Watch the big screen\u2026';
+        statusEl.textContent = 'Your turn! Watch the big screen…';
         posEl.textContent = '';
       } else {
         posEl.textContent = `Position: #${data.position || '?'}`;
-        statusEl.textContent = 'Watch the big screen for your turn\u2026';
+        statusEl.textContent = 'Watch the big screen for your turn…';
       }
     }
   } catch { /* ignore */ }
   setTimeout(() => pollRegistrationStatus(id), 2500);
 }
 
-// ===== EVENTS (display) =====
-function initDisplayEvents() {
-  if (IS_REGISTER) return;
-
-  addBtn.addEventListener('click', () => {
-    items.push({ icon: '\u{1F381}', name: 'New Prize', weight: 10, stock: 10, won: 0 });
-    renderItems(); drawWheel(); renderStock(); saveConfig();
-  });
-
-  resetBtn.addEventListener('click', () => {
-    if (confirm('Reset prize list to defaults? This will clear all custom items.')) {
-      items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-      renderItems(); drawWheel(); renderStock(); saveConfig();
-    }
-  });
-
-  clearBtn.addEventListener('click', () => {
-    if (confirm('Clear all draw history?')) {
-      drawHistory = [];
-      renderHistory(); saveConfig();
-    }
-  });
-
-  spinBtn.addEventListener('click', () => {
-    if (spinQueue.length > 0) {
-      if (serverOnline) {
-        // Pop from server queue
-        fetchNextFromServer().then(person => {
-          if (person) {
-            // Remove from local queue too
-            spinQueue = spinQueue.filter(q => q.id !== person.id);
-            renderQueue();
-            spin(person);
-          } else {
-            spinFromQueue();
-          }
-        });
-      } else {
-        spinFromQueue();
-      }
-    } else {
-      spin(null);
-    }
-  });
-
-  manualSpinBtn.addEventListener('click', () => spin(null));
-
-  winnerClose.addEventListener('click', () => winnerOverlay.classList.remove('show'));
-  toggleConfigBtn.addEventListener('click', () => {
-    const isHidden = app.classList.contains('hide-config');
-    if (isHidden) {
-      openSettings();
-    } else {
-      app.classList.add('hide-config');
-    }
-  });
-
-  fullscreenBtn.addEventListener('click', toggleFullscreen);
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) app.classList.remove('hide-config');
-  });
-
-  // Manual add to queue
-  $('manualAddBtn').addEventListener('click', () => {
-    const name = $('manualName').value.trim();
-    const course = $('manualCourse').value.trim();
-    if (!name) return;
-    const entry = { id: Date.now(), name, course, phone: '', email: '', timestamp: Date.now() };
-    if (serverOnline) {
-      fetch('/api/queue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry),
-      }).then(() => checkServer()).catch(() => {
-        spinQueue.push(entry);
-        renderQueue(); saveConfig();
-      });
-    } else {
-      spinQueue.push(entry);
-      renderQueue(); saveConfig();
-    }
-    $('manualName').value = '';
-    $('manualCourse').value = '';
-  });
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-    if (e.code === 'Space') { e.preventDefault(); if (!isSpinning) spinBtn.click(); }
-    else if (e.code === 'KeyF') { e.preventDefault(); toggleFullscreen(); }
-    else if (e.code === 'Escape') { winnerOverlay.classList.remove('show'); }
-  });
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen?.().catch(() => {});
-    app.classList.add('hide-config');
-  } else {
-    document.exitFullscreen?.();
-  }
-}
-
-// ===== SETTINGS PASSWORD =====
-async function hashPassword(pw) {
-  const data = new TextEncoder().encode(pw);
-  const buf = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function getStoredPasswordHash() {
-  return localStorage.getItem('codexWheel_pwHash') || null;
-}
-
-function hasPassword() {
-  return !!getStoredPasswordHash();
-}
-
-function showSettingsLock() {
-  if (!settingsLock) return;
-  settingsLock.style.display = 'flex';
-  lockError.textContent = '';
-  lockPasswordInput.value = '';
-  lockPasswordInput.focus();
-}
-
-function hideSettingsLock() {
-  if (!settingsLock) return;
-  settingsLock.style.display = 'none';
-  settingsUnlocked = true;
-}
-
-function updatePasswordUI() {
-  if (!passwordSection) return;
-  const has = hasPassword();
-  $('pwRemoveBtn').style.display = has ? '' : 'none';
-  $('pwNew').placeholder = has ? 'New password' : 'Set a password';
-}
-
-function initPasswordEvents() {
-  if (IS_REGISTER) return;
-
-  $('pwSaveBtn').addEventListener('click', async () => {
-    const pw = $('pwNew').value;
-    const confirm = $('pwConfirm').value;
-    const msg = $('pwMsg');
-    if (!pw) { msg.textContent = 'Enter a password.'; msg.className = 'pw-msg error'; return; }
-    if (pw.length < 4) { msg.textContent = 'Minimum 4 characters.'; msg.className = 'pw-msg error'; return; }
-    if (pw !== confirm) { msg.textContent = 'Passwords do not match.'; msg.className = 'pw-msg error'; return; }
-    const hash = await hashPassword(pw);
-    localStorage.setItem('codexWheel_pwHash', hash);
-    $('pwNew').value = '';
-    $('pwConfirm').value = '';
-    msg.textContent = 'Password saved!';
-    msg.className = 'pw-msg success';
-    updatePasswordUI();
-    setTimeout(() => { msg.textContent = ''; }, 2000);
-  });
-
-  $('pwRemoveBtn').addEventListener('click', () => {
-    if (confirm('Remove the settings password? Anyone will be able to access settings.')) {
-      localStorage.removeItem('codexWheel_pwHash');
-      const msg = $('pwMsg');
-      msg.textContent = 'Password removed.';
-      msg.className = 'pw-msg success';
-      updatePasswordUI();
-      setTimeout(() => { msg.textContent = ''; }, 2000);
-    }
-  });
-
-  lockUnlockBtn.addEventListener('click', async () => {
-    const pw = lockPasswordInput.value;
-    if (!pw) { lockError.textContent = 'Enter the password.'; return; }
-    const hash = await hashPassword(pw);
-    if (hash === getStoredPasswordHash()) {
-      hideSettingsLock();
-    } else {
-      lockError.textContent = 'Wrong password.';
-      lockPasswordInput.value = '';
-      lockPasswordInput.focus();
-    }
-  });
-
-  lockPasswordInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); lockUnlockBtn.click(); }
-  });
-
-  $('lockForgotBtn').addEventListener('click', () => {
-    const answer = prompt('To reset the password, type RESET in the box below:');
-    if (answer && answer.trim().toUpperCase() === 'RESET') {
-      localStorage.removeItem('codexWheel_pwHash');
-      hideSettingsLock();
-      updatePasswordUI();
-      alert('Password has been removed. You can set a new one in Settings.');
-    }
-  });
-}
-
-// ===== RECONNECT =====
-function initReconnectButton() {
-  if (IS_REGISTER || !reconnectBtn) return;
-  reconnectBtn.addEventListener('click', () => {
-    reconnectBtn.classList.add('trying');
-    reconnectBtn.textContent = '\u21BB TRYING\u2026';
-    // Clear the existing poll timer and try immediately
-    if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
-    checkServer().then(() => {
-      reconnectBtn.classList.remove('trying');
-      reconnectBtn.textContent = '\u21BB RECONNECT';
-    });
-  });
-}
-
-// ===== SETTINGS TOGGLE (with lock check) =====
-function openSettings() {
-  app.classList.remove('hide-config');
-  if (hasPassword() && !settingsUnlocked) {
-    showSettingsLock();
-  }
-}
-
-// ===== INIT =====
 if (IS_REGISTER) {
   initRegisterForm();
 } else {
-  loadConfig();
-  initTabs();
-  renderItems();
-  drawWheel();
-  renderStock();
-  renderQueue();
-  renderHistory();
   generateQR();
   initDisplayEvents();
-  initPasswordEvents();
-  initReconnectButton();
-  updatePasswordUI();
-  checkServer();
+  pollLoop();
 }
 </script>
 </body>

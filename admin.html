@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CODEX GATE — Admin</title>
+<style>
+  :root {
+    --purple-deep:     #3D1B6B;
+    --purple-mid:      #7B43B8;
+    --purple-light:    #E5D6F2;
+    --purple-pale:     #F5F0FB;
+    --purple-lavender: #9B7BC4;
+    --purple-darker:   #5B2C9C;
+    --white:           #FFFFFF;
+    --green:           #2D8C4E;
+    --red:             #C0392B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Calibri', 'Inter', 'Segoe UI', sans-serif;
+    background: radial-gradient(ellipse at top, var(--purple-pale), #ECE0F7 70%);
+    color: var(--purple-deep);
+    min-height: 100vh;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+    background: var(--white);
+    border-bottom: 1px solid var(--purple-light);
+  }
+  .brand { font-size: 12px; font-weight: bold; color: var(--purple-deep); letter-spacing: 4px; }
+  .brand strong { font-size: 20px; letter-spacing: 3px; }
+  .top-actions { display: flex; gap: 10px; align-items: center; }
+  .top-link, .top-btn {
+    background: var(--white);
+    border: 1px solid var(--purple-light);
+    color: var(--purple-deep);
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .top-link:hover, .top-btn:hover { background: var(--purple-pale); }
+  .conn-pill {
+    font-size: 10px;
+    color: var(--purple-lavender);
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: var(--purple-pale);
+  }
+  .conn-pill.online { color: var(--green); }
+
+  /* CONTAINER */
+  .container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 14px rgba(61,27,107,0.08);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    background: transparent;
+    border: none;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--purple-lavender);
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--purple-mid); }
+  .tab-btn.active { color: var(--white); background: var(--purple-deep); }
+  .tab-btn .badge {
+    display: inline-block;
+    background: var(--green);
+    color: var(--white);
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 99px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .panel {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(61,27,107,0.08);
+    display: none;
+  }
+  .panel.active { display: block; }
+  .panel h2 {
+    font-size: 15px;
+    color: var(--purple-deep);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .panel .hint {
+    font-size: 12px;
+    color: var(--purple-lavender);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  /* item rows */
+  .col-header, .item-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 100px 60px 40px;
+    gap: 10px;
+    align-items: center;
+  }
+  .col-header {
+    font-size: 9px;
+    color: var(--purple-lavender);
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding: 0 2px;
+  }
+  .col-header div:nth-child(1),
+  .col-header div:nth-child(3),
+  .col-header div:nth-child(4) { text-align: center; }
+  .item-row {
+    padding: 6px 2px;
+    margin-bottom: 6px;
+  }
+  .item-row input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--purple-light);
+    background: var(--purple-pale);
+    color: var(--purple-deep);
+    font-size: 14px;
+    font-family: inherit;
+    width: 100%;
+  }
+  .item-row input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
+  .item-row input.icon { text-align: center; font-size: 22px; padding: 6px; }
+  .item-row input.weight, .item-row input.stock { text-align: center; }
+  .item-row .remove {
+    background: transparent;
+    border: 1px solid var(--purple-light);
+    color: var(--purple-lavender);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    font-family: inherit;
+    margin: 0 auto;
+  }
+  .item-row .remove:hover { background: var(--purple-light); color: var(--red); }
+
+  /* stock rows */
+  .stock-header, .stock-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 100px 100px;
+    gap: 10px;
+    align-items: center;
+  }
+  .stock-header {
+    font-size: 9px;
+    color: var(--purple-lavender);
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding: 0 2px;
+  }
+  .stock-header div:nth-child(1),
+  .stock-header div:nth-child(3),
+  .stock-header div:nth-child(4) { text-align: center; }
+  .stock-row {
+    padding: 8px 2px;
+    border-bottom: 1px solid var(--purple-pale);
+    font-size: 14px;
+  }
+  .stock-row .stock-icon { text-align: center; font-size: 22px; }
+  .stock-row .stock-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .stock-row input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--purple-light);
+    background: var(--purple-pale);
+    color: var(--purple-deep);
+    font-size: 14px;
+    font-family: inherit;
+    width: 100%;
+    text-align: center;
+  }
+  .stock-row input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
+  .stock-row .won-count {
+    text-align: center;
+    color: var(--purple-lavender);
+    font-weight: bold;
+  }
+  .stock-row.out-of-stock { opacity: 0.45; }
+
+  /* queue */
+  .queue-entry {
+    padding: 14px 16px;
+    background: var(--purple-pale);
+    margin-bottom: 6px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  .queue-entry .q-info { flex: 1; }
+  .queue-entry .q-name { font-weight: bold; font-size: 14px; }
+  .queue-entry .q-meta { font-size: 11px; color: var(--purple-lavender); margin-top: 2px; }
+  .queue-entry .q-remove {
+    background: transparent;
+    border: 1px solid var(--purple-light);
+    color: var(--purple-lavender);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .queue-entry .q-remove:hover { background: var(--purple-light); color: var(--red); }
+  .empty-state {
+    padding: 30px;
+    text-align: center;
+    color: var(--purple-lavender);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .manual-add-form {
+    margin-top: 16px;
+    padding: 18px;
+    background: var(--purple-pale);
+    border-radius: 12px;
+  }
+  .manual-add-form h4 {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--purple-mid);
+    margin-bottom: 10px;
+  }
+  .manual-add-form .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .manual-add-form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--purple-light);
+    background: var(--white);
+    color: var(--purple-deep);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .manual-add-form input:focus { outline: none; border-color: var(--purple-mid); }
+
+  /* history */
+  .history-entry {
+    padding: 12px 16px;
+    background: var(--purple-pale);
+    margin-bottom: 5px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .history-entry .h-top {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .history-entry .h-prize { font-weight: bold; }
+  .history-entry .h-time { color: var(--purple-lavender); font-size: 11px; }
+  .history-entry .h-person { color: var(--purple-mid); font-size: 12px; margin-top: 3px; }
+
+  /* buttons */
+  .panel-btn {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--white);
+    border: 1px dashed var(--purple-mid);
+    color: var(--purple-mid);
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-family: inherit;
+  }
+  .panel-btn:hover { background: var(--purple-pale); }
+  .panel-btn.secondary { border-style: solid; border-color: var(--purple-light); color: var(--purple-lavender); }
+  .panel-btn.secondary:hover { color: var(--purple-deep); }
+  .panel-btn.danger { border-color: var(--red); color: var(--red); }
+  .panel-btn.danger:hover { background: #fde8e8; }
+  .panel-btn.primary {
+    border: none;
+    background: var(--purple-deep);
+    color: var(--white);
+  }
+  .panel-btn.primary:hover { background: var(--purple-darker); }
+
+  /* settings tab */
+  .settings-section {
+    padding: 18px;
+    background: var(--purple-pale);
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .settings-section h3 {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--purple-mid);
+    margin-bottom: 10px;
+  }
+  .settings-section input {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--purple-light);
+    background: var(--white);
+    color: var(--purple-deep);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .settings-section input:focus { outline: none; border-color: var(--purple-mid); }
+  .msg { font-size: 12px; min-height: 18px; margin-top: 6px; }
+  .msg.success { color: var(--green); }
+  .msg.error { color: var(--red); }
+
+  /* LOCK SCREEN */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at top, var(--purple-pale), #ECE0F7 70%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .lock-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 48px 36px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(61,27,107,0.13);
+    text-align: center;
+  }
+  .lock-card .lock-icon { font-size: 56px; margin-bottom: 16px; }
+  .lock-card .lock-title {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: var(--purple-deep);
+    margin-bottom: 6px;
+  }
+  .lock-card .lock-hint {
+    font-size: 12px;
+    color: var(--purple-lavender);
+    margin-bottom: 24px;
+  }
+  .lock-card input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--purple-light);
+    background: var(--purple-pale);
+    color: var(--purple-deep);
+    font-size: 18px;
+    font-family: inherit;
+    text-align: center;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+  }
+  .lock-card input:focus { outline: none; border-color: var(--purple-mid); background: var(--white); }
+  .lock-card button {
+    width: 100%;
+    padding: 14px;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    background: var(--purple-deep);
+    color: var(--white);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .lock-card button:hover { background: var(--purple-darker); }
+  .lock-card .lock-error {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--red);
+    min-height: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .col-header, .item-row { grid-template-columns: 50px 1fr 70px 50px 32px; gap: 6px; }
+    .stock-header, .stock-row { grid-template-columns: 50px 1fr 80px 60px; gap: 6px; }
+    .tab-btn { font-size: 10px; padding: 10px 4px; letter-spacing: 1px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen" style="display:none;">
+  <div class="lock-card">
+    <div class="lock-icon">&#128274;</div>
+    <div class="lock-title">ADMIN LOCKED</div>
+    <div class="lock-hint">Enter the admin password to continue.</div>
+    <input type="password" id="lockInput" placeholder="••••••" autocomplete="current-password" />
+    <button id="lockUnlockBtn">UNLOCK</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminApp" style="display:none;">
+  <div class="topbar">
+    <div class="brand">CODEX GATE <strong>·</strong> ADMIN</div>
+    <div class="top-actions">
+      <span class="conn-pill" id="connPill">CONNECTING…</span>
+      <a class="top-link" href="/" target="_blank" rel="noopener">VIEW SPINNER</a>
+      <button class="top-btn" id="lockBtn" style="display:none;">LOCK</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="prizes">PRIZES</button>
+      <button class="tab-btn" data-tab="stock">STOCK</button>
+      <button class="tab-btn" data-tab="queue">QUEUE <span class="badge" id="queueBadge" style="display:none;">0</span></button>
+      <button class="tab-btn" data-tab="history">HISTORY</button>
+      <button class="tab-btn" data-tab="settings">SETTINGS</button>
+    </div>
+
+    <!-- PRIZES -->
+    <div class="panel active" id="panel-prizes">
+      <h2>PRIZE LINEUP</h2>
+      <p class="hint">Each prize has a <strong>weight</strong> (higher = more likely). Set weight to 0 to skip without deleting. Use <strong>-1</strong> stock for unlimited.</p>
+      <div class="col-header">
+        <div>ICON</div>
+        <div style="text-align:left;">NAME</div>
+        <div>WEIGHT</div>
+        <div>STOCK</div>
+        <div></div>
+      </div>
+      <div id="itemList"></div>
+      <button class="panel-btn" id="addBtn">+ ADD PRIZE</button>
+      <button class="panel-btn danger" id="resetBtn">RESET TO DEFAULTS</button>
+    </div>
+
+    <!-- STOCK -->
+    <div class="panel" id="panel-stock">
+      <h2>STOCK MANAGEMENT</h2>
+      <p class="hint">Track how many of each prize remain. 0 stock = excluded from draws. -1 = unlimited.</p>
+      <div class="stock-header">
+        <div></div>
+        <div style="text-align:left;">ITEM</div>
+        <div>STOCK</div>
+        <div>WON</div>
+      </div>
+      <div id="stockList"></div>
+    </div>
+
+    <!-- QUEUE -->
+    <div class="panel" id="panel-queue">
+      <h2>SPIN QUEUE</h2>
+      <p class="hint">People who registered via the QR form appear here. They're spun next on the spinner display.</p>
+      <div id="queueList"></div>
+      <div class="manual-add-form">
+        <h4>ADD MANUALLY</h4>
+        <div class="row">
+          <input id="manualName" placeholder="Name" />
+          <input id="manualCourse" placeholder="Course" />
+        </div>
+        <button class="panel-btn" id="manualAddBtn">+ ADD TO QUEUE</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="panel" id="panel-history">
+      <h2>RECENT DRAWS</h2>
+      <p class="hint">The last 50 results, most recent first.</p>
+      <div id="historyList"></div>
+      <button class="panel-btn danger" id="clearHistoryBtn">CLEAR HISTORY</button>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <h2>SETTINGS</h2>
+      <p class="hint">Manage the admin password. This password protects this admin page across all devices.</p>
+      <div class="settings-section">
+        <h3 id="pwSectionTitle">SET ADMIN PASSWORD</h3>
+        <input type="password" id="pwCurrent" placeholder="Current password" style="display:none;" />
+        <input type="password" id="pwNew" placeholder="New password (min 4 chars)" />
+        <input type="password" id="pwConfirm" placeholder="Confirm new password" />
+        <button class="panel-btn primary" id="pwSaveBtn">SAVE PASSWORD</button>
+        <button class="panel-btn danger" id="pwRemoveBtn" style="display:none;">REMOVE PASSWORD</button>
+        <div class="msg" id="pwMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtTime(iso) {
+  try { return new Date(iso).toLocaleString(); } catch { return ''; }
+}
+
+async function hashPassword(pw) {
+  const data = new TextEncoder().encode(pw);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+let state = {
+  items: [],
+  queue: [],
+  history: [],
+  hasPassword: false,
+  authedHash: null,
+};
+
+// ===== LOCK FLOW =====
+async function checkAuth() {
+  const res = await fetch('/api/settings');
+  if (!res.ok) return false;
+  const data = await res.json();
+  state.hasPassword = !!data.hasPassword;
+  if (!state.hasPassword) return true;
+  const cached = sessionStorage.getItem('cgw_admin_hash');
+  if (cached) {
+    const v = await fetch('/api/settings/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash: cached }),
+    }).then(r => r.json()).catch(() => null);
+    if (v && v.ok) {
+      state.authedHash = cached;
+      return true;
+    }
+    sessionStorage.removeItem('cgw_admin_hash');
+  }
+  return false;
+}
+
+function showLock() {
+  $('lockScreen').style.display = 'flex';
+  $('adminApp').style.display = 'none';
+  setTimeout(() => $('lockInput').focus(), 50);
+}
+function showApp() {
+  $('lockScreen').style.display = 'none';
+  $('adminApp').style.display = '';
+  $('lockBtn').style.display = state.hasPassword ? '' : 'none';
+  startPolling();
+}
+
+async function tryUnlock() {
+  const pw = $('lockInput').value;
+  if (!pw) { $('lockError').textContent = 'Enter the password.'; return; }
+  const hash = await hashPassword(pw);
+  const res = await fetch('/api/settings/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ hash }),
+  });
+  const data = await res.json().catch(() => null);
+  if (data && data.ok) {
+    state.authedHash = hash;
+    sessionStorage.setItem('cgw_admin_hash', hash);
+    $('lockError').textContent = '';
+    $('lockInput').value = '';
+    showApp();
+  } else {
+    $('lockError').textContent = 'Wrong password.';
+    $('lockInput').value = '';
+    $('lockInput').focus();
+  }
+}
+
+$('lockUnlockBtn').addEventListener('click', tryUnlock);
+$('lockInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+$('lockBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('cgw_admin_hash');
+  state.authedHash = null;
+  showLock();
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $('panel-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'queue') loadQueue();
+    if (btn.dataset.tab === 'history') loadHistory();
+    if (btn.dataset.tab === 'settings') updatePasswordUI();
+  });
+});
+
+// ===== ITEMS =====
+function renderItems() {
+  const list = $('itemList');
+  list.innerHTML = '';
+  state.items.forEach((it) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <input class="icon" data-id="${it.id}" data-k="icon" value="${escapeHtml(it.icon)}" maxlength="6"/>
+      <input data-id="${it.id}" data-k="name" value="${escapeHtml(it.name)}" placeholder="Prize name"/>
+      <input class="weight" type="number" min="0" max="999" data-id="${it.id}" data-k="weight" value="${it.weight}"/>
+      <input class="stock" type="number" min="-1" max="9999" data-id="${it.id}" data-k="stock" value="${it.stock}" title="-1 = unlimited"/>
+      <button class="remove" data-id="${it.id}" title="Remove">&times;</button>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach(inp => {
+    let debounce;
+    inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const k = e.target.dataset.k;
+      let v = e.target.value;
+      if (k === 'weight' || k === 'stock') v = parseInt(v, 10);
+      if (Number.isNaN(v)) return;
+      clearTimeout(debounce);
+      debounce = setTimeout(() => patchItem(id, { [k]: v }), 300);
+    });
+  });
+  list.querySelectorAll('.remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Remove this prize?')) deleteItem(+btn.dataset.id);
+    });
+  });
+}
+
+function renderStock() {
+  const list = $('stockList');
+  list.innerHTML = '';
+  if (state.items.length === 0) {
+    list.innerHTML = '<div class="empty-state">No prizes yet. Add some in the Prizes tab.</div>';
+    return;
+  }
+  state.items.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'stock-row' + (it.stock === 0 ? ' out-of-stock' : '');
+    row.innerHTML = `
+      <div class="stock-icon">${escapeHtml(it.icon)}</div>
+      <div class="stock-name">${escapeHtml(it.name)}</div>
+      <input type="number" min="-1" max="9999" data-id="${it.id}" value="${it.stock}" title="-1 = unlimited"/>
+      <div class="won-count">${it.won || 0}</div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach(inp => {
+    let debounce;
+    inp.addEventListener('input', e => {
+      const id = +e.target.dataset.id;
+      const v = parseInt(e.target.value, 10);
+      if (Number.isNaN(v)) return;
+      clearTimeout(debounce);
+      debounce = setTimeout(() => patchItem(id, { stock: Math.max(-1, v) }), 300);
+    });
+  });
+}
+
+async function loadItems() {
+  try {
+    const res = await fetch('/api/items');
+    if (!res.ok) return false;
+    const data = await res.json();
+    state.items = data.items || [];
+    renderItems();
+    renderStock();
+    return true;
+  } catch { return false; }
+}
+
+async function patchItem(id, patch) {
+  const res = await fetch(`/api/items/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    const idx = state.items.findIndex(i => i.id === id);
+    if (idx >= 0 && data.item) state.items[idx] = data.item;
+    renderStock();
+  }
+}
+
+async function deleteItem(id) {
+  const res = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    state.items = state.items.filter(i => i.id !== id);
+    renderItems();
+    renderStock();
+  }
+}
+
+$('addBtn').addEventListener('click', async () => {
+  const res = await fetch('/api/items', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ icon: '\u{1F381}', name: 'New Prize', weight: 10, stock: 10 }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    if (data.item) state.items.push(data.item);
+    renderItems();
+    renderStock();
+  }
+});
+
+$('resetBtn').addEventListener('click', async () => {
+  if (!confirm('Reset all prizes to defaults? Custom items will be lost.')) return;
+  const res = await fetch('/api/items/reset', { method: 'POST' });
+  if (res.ok) {
+    const data = await res.json();
+    state.items = data.items || [];
+    renderItems();
+    renderStock();
+  }
+});
+
+// ===== QUEUE =====
+async function loadQueue() {
+  try {
+    const res = await fetch('/api/queue');
+    if (!res.ok) return false;
+    const data = await res.json();
+    state.queue = data.queue || [];
+    renderQueue();
+    return true;
+  } catch { return false; }
+}
+
+function renderQueue() {
+  const list = $('queueList');
+  list.innerHTML = '';
+  const badge = $('queueBadge');
+  if (state.queue.length === 0) {
+    list.innerHTML = '<div class="empty-state">No one in queue. Share the QR code on the spinner display!</div>';
+    badge.style.display = 'none';
+  } else {
+    state.queue.forEach((e) => {
+      const div = document.createElement('div');
+      div.className = 'queue-entry';
+      div.innerHTML = `
+        <div class="q-info">
+          <div class="q-name">${escapeHtml(e.name)}</div>
+          <div class="q-meta">${escapeHtml(e.course || '')}${e.phone ? ' · ' + escapeHtml(e.phone) : ''}${e.email ? ' · ' + escapeHtml(e.email) : ''}</div>
+        </div>
+        <button class="q-remove" data-id="${e.id}" title="Remove">&times;</button>`;
+      list.appendChild(div);
+    });
+    list.querySelectorAll('.q-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = +btn.dataset.id;
+        const res = await fetch(`/api/queue/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          state.queue = state.queue.filter(q => q.id !== id);
+          renderQueue();
+        }
+      });
+    });
+    badge.textContent = state.queue.length;
+    badge.style.display = '';
+  }
+}
+
+$('manualAddBtn').addEventListener('click', async () => {
+  const name = $('manualName').value.trim();
+  const course = $('manualCourse').value.trim();
+  if (!name) return;
+  const res = await fetch('/api/queue', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, course, phone: '', email: '' }),
+  });
+  if (res.ok) {
+    $('manualName').value = '';
+    $('manualCourse').value = '';
+    loadQueue();
+  }
+});
+
+// ===== HISTORY =====
+async function loadHistory() {
+  try {
+    const res = await fetch('/api/history');
+    if (!res.ok) return false;
+    const data = await res.json();
+    state.history = data.history || [];
+    renderHistory();
+    return true;
+  } catch { return false; }
+}
+
+function renderHistory() {
+  const list = $('historyList');
+  list.innerHTML = '';
+  if (state.history.length === 0) {
+    list.innerHTML = '<div class="empty-state">No draws yet.</div>';
+    return;
+  }
+  state.history.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    div.innerHTML = `
+      <div class="h-top">
+        <span class="h-prize">${escapeHtml(e.icon)} ${escapeHtml(e.name)}</span>
+        <span class="h-time">${escapeHtml(fmtTime(e.time))}</span>
+      </div>
+      ${e.person ? `<div class="h-person">Won by: ${escapeHtml(e.person)}</div>` : ''}`;
+    list.appendChild(div);
+  });
+}
+
+$('clearHistoryBtn').addEventListener('click', async () => {
+  if (!confirm('Clear ALL draw history? This cannot be undone.')) return;
+  const res = await fetch('/api/history', { method: 'DELETE' });
+  if (res.ok) {
+    state.history = [];
+    renderHistory();
+  }
+});
+
+// ===== SETTINGS / PASSWORD =====
+function updatePasswordUI() {
+  $('pwSectionTitle').textContent = state.hasPassword ? 'CHANGE ADMIN PASSWORD' : 'SET ADMIN PASSWORD';
+  $('pwCurrent').style.display = state.hasPassword ? '' : 'none';
+  $('pwRemoveBtn').style.display = state.hasPassword ? '' : 'none';
+}
+
+$('pwSaveBtn').addEventListener('click', async () => {
+  const msg = $('pwMsg');
+  msg.textContent = '';
+  msg.className = 'msg';
+  const newPw = $('pwNew').value;
+  const confirmPw = $('pwConfirm').value;
+  if (!newPw) { msg.textContent = 'Enter a new password.'; msg.className = 'msg error'; return; }
+  if (newPw.length < 4) { msg.textContent = 'Minimum 4 characters.'; msg.className = 'msg error'; return; }
+  if (newPw !== confirmPw) { msg.textContent = 'Passwords do not match.'; msg.className = 'msg error'; return; }
+
+  const body = { newHash: await hashPassword(newPw) };
+  if (state.hasPassword) {
+    const curr = $('pwCurrent').value;
+    if (!curr) { msg.textContent = 'Enter your current password.'; msg.className = 'msg error'; return; }
+    body.currentHash = await hashPassword(curr);
+  }
+  const res = await fetch('/api/settings/password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => null);
+  if (res.ok && data && data.ok) {
+    state.hasPassword = !!data.hasPassword;
+    state.authedHash = body.newHash;
+    sessionStorage.setItem('cgw_admin_hash', body.newHash);
+    msg.textContent = 'Password saved!';
+    msg.className = 'msg success';
+    $('pwCurrent').value = '';
+    $('pwNew').value = '';
+    $('pwConfirm').value = '';
+    updatePasswordUI();
+    $('lockBtn').style.display = state.hasPassword ? '' : 'none';
+    setTimeout(() => { msg.textContent = ''; }, 2500);
+  } else {
+    msg.textContent = (data && data.error) || 'Could not save password.';
+    msg.className = 'msg error';
+  }
+});
+
+$('pwRemoveBtn').addEventListener('click', async () => {
+  if (!confirm('Remove the admin password? Anyone will be able to access this page.')) return;
+  const msg = $('pwMsg');
+  msg.textContent = '';
+  msg.className = 'msg';
+  const curr = $('pwCurrent').value;
+  if (!curr) { msg.textContent = 'Enter your current password.'; msg.className = 'msg error'; return; }
+  const res = await fetch('/api/settings/password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentHash: await hashPassword(curr), newHash: null }),
+  });
+  const data = await res.json().catch(() => null);
+  if (res.ok && data && data.ok) {
+    state.hasPassword = false;
+    sessionStorage.removeItem('cgw_admin_hash');
+    msg.textContent = 'Password removed.';
+    msg.className = 'msg success';
+    $('pwCurrent').value = '';
+    updatePasswordUI();
+    $('lockBtn').style.display = 'none';
+  } else {
+    msg.textContent = (data && data.error) || 'Could not remove password.';
+    msg.className = 'msg error';
+  }
+});
+
+// ===== POLLING =====
+let pollHandle = null;
+function setConn(ok) {
+  const pill = $('connPill');
+  pill.textContent = ok ? 'LIVE' : 'OFFLINE';
+  pill.className = 'conn-pill' + (ok ? ' online' : '');
+}
+
+async function pollTick() {
+  const [a, b] = await Promise.all([loadItems(), loadQueue()]);
+  setConn(a && b);
+  pollHandle = setTimeout(pollTick, 3000);
+}
+
+function startPolling() {
+  if (pollHandle) return;
+  pollTick();
+}
+
+// ===== BOOT =====
+(async function init() {
+  const ok = await checkAuth();
+  if (ok) showApp();
+  else showLock();
+})();
+</script>
+</body>
+</html>
