@@ -11,5 +11,8 @@
   },
   "keywords": ["prize-wheel", "event", "kiosk"],
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
 }
